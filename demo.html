@@ -49,25 +49,49 @@
     -webkit-transform: translate(450px, 240px) rotateY(200deg) rotateX(40deg);
 }
 </style>
-<div class="transformed red butterfly">
+<div id="redButterfly" class="transformed red butterfly">
     <div class="transformed red body"></div>
     <div class="transformed red wing left"></div>
     <div class="transformed red wing right"></div>
 </div>
-<div class="transformed yellow butterfly">
+<div id="yellowButterfly" class="transformed yellow butterfly">
     <div class="transformed yellow body"></div>
     <div class="transformed yellow wing left"></div>
     <div class="transformed yellow wing right"></div>
 </div>
-<div class="transformed green butterfly">
+<div id="greenButterfly" class="transformed green butterfly">
     <div class="transformed green body"></div>
     <div class="transformed green wing left"></div>
     <div class="transformed green wing right"></div>
 </div>
-<div class="transformed blue butterfly">
+<div id="blueButterfly" class="transformed blue butterfly">
     <div class="transformed blue body"></div>
     <div class="transformed blue wing left"></div>
     <div class="transformed blue wing right"></div>
 </div>
+<script src="web-animations.js"></script>
 <script>
+[
+  "redButterfly",
+  "yellowButterfly",
+  "greenButterfly",
+  "blueButterfly",
+].forEach(function(id) {
+  var butterfly = document.querySelector('#' + id);
+  var leftWing = butterfly.querySelector('.left.wing');
+  var rightWing = butterfly.querySelector('.right.wing');
+  var wingFlapDuration = 0.2 + Math.random() * 0.1;
+  document.timeline.play(
+    new ParGroup([
+      new SeqGroup([
+        new Animation(leftWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(-225deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
+        new Animation(leftWing, [{transform: 'rotateY(-225deg)'}, {transform: 'rotateY(-90deg)'}], {duration: wingFlapDuration, easing: 'ease-in'}),
+      ]),
+      new SeqGroup([
+        new Animation(rightWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(45deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
+        new Animation(rightWing, [{transform: 'rotateY(45deg)'}, {transform: 'rotateY(-90deg)'}], {duration: wingFlapDuration, easing: 'ease-in'}),
+      ]),
+    ], {iterations: Infinity, iterationStart: Math.random()}));
+});
+
 </script>
