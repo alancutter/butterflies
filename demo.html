@@ -1,0 +1,73 @@
+<!doctype html>
+<style>
+.transformed {
+    position: absolute;
+    -webkit-transform-style: preserve-3d;
+}
+.body {
+    width: 100px;
+    height: 220px;
+    background-image: url(butterflies.png);
+    -webkit-transform: translateX(-50px);
+}
+.wing {
+    width: 100px;
+    height: 250px;
+    background-image: url(butterflies.png);
+    -webkit-transform-origin: 0 125px;
+}
+.left {
+    -webkit-transform: rotateY(-135deg);
+}
+.right {
+    -webkit-transform: rotateY(-45deg);
+}
+.butterfly {
+    left: 0;
+    top: -125px;
+    -webkit-transform-origin: 0 125px;
+}
+
+.red.wing { background-position: -100px 0; }
+.yellow.body { background-position: -200px 0; }
+.yellow.wing { background-position: -300px 0; }
+.green.body { background-position: -400px 0; }
+.green.wing { background-position: -500px 0; }
+.blue.body { background-position: -600px 0; }
+.blue.wing { background-position: -700px 0; }
+
+.red.butterfly {
+    -webkit-transform: translate(160px, 150px) rotateY(-45deg) rotateX(60deg);
+}
+.yellow.butterfly {
+    -webkit-transform: translate(150px, 300px) rotateY(35deg) rotateX(60deg);
+}
+.green.butterfly {
+    -webkit-transform: translate(300px, 250px) rotateY(-10deg) rotateX(70deg);
+}
+.blue.butterfly {
+    -webkit-transform: translate(450px, 240px) rotateY(200deg) rotateX(40deg);
+}
+</style>
+<div class="transformed red butterfly">
+    <div class="transformed red body"></div>
+    <div class="transformed red wing left"></div>
+    <div class="transformed red wing right"></div>
+</div>
+<div class="transformed yellow butterfly">
+    <div class="transformed yellow body"></div>
+    <div class="transformed yellow wing left"></div>
+    <div class="transformed yellow wing right"></div>
+</div>
+<div class="transformed green butterfly">
+    <div class="transformed green body"></div>
+    <div class="transformed green wing left"></div>
+    <div class="transformed green wing right"></div>
+</div>
+<div class="transformed blue butterfly">
+    <div class="transformed blue body"></div>
+    <div class="transformed blue wing left"></div>
+    <div class="transformed blue wing right"></div>
+</div>
+<script>
+</script>
