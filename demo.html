@@ -22,10 +22,13 @@
 .right {
     -webkit-transform: rotateY(-45deg);
 }
-.butterfly {
+.rotation {
     left: 0;
     top: -125px;
     -webkit-transform-origin: 0 125px;
+}
+#glasshouse {
+    -webkit-perspective: 600px;
 }
 
 .red.wing { background-position: -100px 0; }
@@ -36,38 +39,45 @@
 .blue.body { background-position: -600px 0; }
 .blue.wing { background-position: -700px 0; }
 
-.red.butterfly {
-    -webkit-transform: translate(160px, 150px) rotateY(-45deg) rotateX(60deg);
-}
-.yellow.butterfly {
-    -webkit-transform: translate(150px, 300px) rotateY(35deg) rotateX(60deg);
-}
-.green.butterfly {
-    -webkit-transform: translate(300px, 250px) rotateY(-10deg) rotateX(70deg);
-}
-.blue.butterfly {
-    -webkit-transform: translate(450px, 240px) rotateY(200deg) rotateX(40deg);
-}
+.red.translation { -webkit-transform: translate(160px, 150px); }
+.yellow.translation { -webkit-transform: translate(300px, 250px); }
+.green.translation { -webkit-transform: translate(150px, 300px); }
+.blue.translation { -webkit-transform: translate(200px, 240px); }
+
+.red.rotation { -webkit-transform: rotateY(-45deg) rotateX(60deg); }
+.yellow.rotation { -webkit-transform: rotateY(35deg) rotateX(60deg); }
+.green.rotation { -webkit-transform: rotateY(-10deg) rotateX(70deg); }
+.blue.rotation { -webkit-transform: rotateY(200deg) rotateX(40deg); }
 </style>
-<div id="redButterfly" class="transformed red butterfly">
-    <div class="transformed red body"></div>
-    <div class="transformed red wing left"></div>
-    <div class="transformed red wing right"></div>
-</div>
-<div id="yellowButterfly" class="transformed yellow butterfly">
-    <div class="transformed yellow body"></div>
-    <div class="transformed yellow wing left"></div>
-    <div class="transformed yellow wing right"></div>
-</div>
-<div id="greenButterfly" class="transformed green butterfly">
-    <div class="transformed green body"></div>
-    <div class="transformed green wing left"></div>
-    <div class="transformed green wing right"></div>
-</div>
-<div id="blueButterfly" class="transformed blue butterfly">
-    <div class="transformed blue body"></div>
-    <div class="transformed blue wing left"></div>
-    <div class="transformed blue wing right"></div>
+<div id="glasshouse">
+  <div id="redButterfly" class="transformed red translation">
+    <div class="transformed red rotation">
+        <div class="transformed red body"></div>
+        <div class="transformed red wing left"></div>
+        <div class="transformed red wing right"></div>
+    </div>
+  </div>
+  <div id="yellowButterfly" class="transformed yellow translation">
+    <div class="transformed yellow rotation">
+        <div class="transformed yellow body"></div>
+        <div class="transformed yellow wing left"></div>
+        <div class="transformed yellow wing right"></div>
+    </div>
+  </div>
+  <div id="greenButterfly" class="transformed green translation">
+    <div class="transformed green rotation">
+        <div class="transformed green body"></div>
+        <div class="transformed green wing left"></div>
+        <div class="transformed green wing right"></div>
+    </div>
+  </div>
+  <div id="blueButterfly" class="transformed blue translation">
+    <div class="transformed blue rotation">
+        <div class="transformed blue body"></div>
+        <div class="transformed blue wing left"></div>
+        <div class="transformed blue wing right"></div>
+    </div>
+  </div>
 </div>
 <script src="web-animations.js"></script>
 <script>
