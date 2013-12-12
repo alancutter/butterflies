@@ -1,34 +1,42 @@
 <!doctype html>
 <style>
-.transformed {
-    position: absolute;
-    -webkit-transform-style: preserve-3d;
+#glasshouse {
+  -webkit-perspective: 600px;
+  perspective: 600px;
+}
+.translated {
+  position: absolute;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+.rotated {
+  position: absolute;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  left: 0;
+  top: -125px;
+  -webkit-transform-origin: 0 125px;
+  transform-origin: 0 125px;
 }
 .body {
-    width: 100px;
-    height: 220px;
-    background-image: url(butterflies.png);
-    -webkit-transform: translateX(-50px);
+  position: absolute;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  width: 100px;
+  height: 220px;
+  background-image: url(butterflies.png);
+  -webkit-transform: translateX(-50px);
+  transform: translateX(-50px);
 }
 .wing {
-    width: 100px;
-    height: 250px;
-    background-image: url(butterflies.png);
-    -webkit-transform-origin: 0 125px;
-}
-.left {
-    -webkit-transform: rotateY(-135deg);
-}
-.right {
-    -webkit-transform: rotateY(-45deg);
-}
-.rotation {
-    left: 0;
-    top: -125px;
-    -webkit-transform-origin: 0 125px;
-}
-#glasshouse {
-    -webkit-perspective: 600px;
+  position: absolute;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  width: 100px;
+  height: 250px;
+  background-image: url(butterflies.png);
+  -webkit-transform-origin: 0 125px;
+  transform-origin: 0 125px;
 }
 
 .red.wing { background-position: -100px 0; }
@@ -39,55 +47,68 @@
 .blue.body { background-position: -600px 0; }
 .blue.wing { background-position: -700px 0; }
 
-.red.translation { -webkit-transform: translate(160px, 150px); }
-.yellow.translation { -webkit-transform: translate(300px, 250px); }
-.green.translation { -webkit-transform: translate(150px, 300px); }
-.blue.translation { -webkit-transform: translate(200px, 240px); }
+.red.translated {
+  -webkit-transform: translate(160px, 150px);
+  transform: translate(160px, 150px);
+}
+.yellow.translated {
+  -webkit-transform: translate(300px, 250px);
+  transform: translate(300px, 250px);
+}
+.green.translated {
+  -webkit-transform: translate(150px, 300px);
+  transform: translate(150px, 300px);
+}
+.blue.translated {
+  -webkit-transform: translate(200px, 240px);
+  transform: translate(200px, 240px);
+}
 
-.red.rotation { -webkit-transform: rotateY(-45deg) rotateX(60deg); }
-.yellow.rotation { -webkit-transform: rotateY(35deg) rotateX(60deg); }
-.green.rotation { -webkit-transform: rotateY(-10deg) rotateX(70deg); }
-.blue.rotation { -webkit-transform: rotateY(200deg) rotateX(40deg); }
+.red.rotated {
+  -webkit-transform: rotateY(-45deg) rotateX(60deg);
+  transform: rotateY(-45deg) rotateX(60deg);
+}
+.yellow.rotated {
+  -webkit-transform: rotateY(35deg) rotateX(60deg);
+  transform: rotateY(35deg) rotateX(60deg);
+}
+.green.rotated {
+  -webkit-transform: rotateY(-10deg) rotateX(70deg);
+  transform: rotateY(-10deg) rotateX(70deg);
+}
+.blue.rotated {
+  -webkit-transform: rotateY(200deg) rotateX(40deg);
+  transform: rotateY(200deg) rotateX(40deg);
+}
 </style>
-<div id="glasshouse">
-  <div id="redButterfly" class="transformed red translation">
-    <div class="transformed red rotation">
-        <div class="transformed red body"></div>
-        <div class="transformed red wing left"></div>
-        <div class="transformed red wing right"></div>
+
+<template id="butterflyTemplate">
+  <div class="translated">
+    <div class="rotated">
+        <div class="body"></div>
+        <div class="wing left"></div>
+        <div class="wing right"></div>
     </div>
   </div>
-  <div id="yellowButterfly" class="transformed yellow translation">
-    <div class="transformed yellow rotation">
-        <div class="transformed yellow body"></div>
-        <div class="transformed yellow wing left"></div>
-        <div class="transformed yellow wing right"></div>
-    </div>
-  </div>
-  <div id="greenButterfly" class="transformed green translation">
-    <div class="transformed green rotation">
-        <div class="transformed green body"></div>
-        <div class="transformed green wing left"></div>
-        <div class="transformed green wing right"></div>
-    </div>
-  </div>
-  <div id="blueButterfly" class="transformed blue translation">
-    <div class="transformed blue rotation">
-        <div class="transformed blue body"></div>
-        <div class="transformed blue wing left"></div>
-        <div class="transformed blue wing right"></div>
-    </div>
-  </div>
-</div>
+</template>
+
+<div id="glasshouse"></div>
+
 <script src="web-animations.js"></script>
 <script>
-[
-  "redButterfly",
-  "yellowButterfly",
-  "greenButterfly",
-  "blueButterfly",
-].forEach(function(id) {
-  var butterfly = document.querySelector('#' + id);
+var colours = ['red', 'yellow', 'green', 'blue'];
+
+function mapDomElements(element, func) {
+  func(element);
+  for (var i = 0; i < element.children.length; i++) {
+    mapDomElements(element.children[i], func);
+  }
+}
+
+function createButterfly(colour) {
+  var butterfly = butterflyTemplate.content.childNodes[1].cloneNode();
+  mapDomElements(butterfly, function(div) { div.classList.add(colour); });
+  glasshouse.appendChild(butterfly);
   var leftWing = butterfly.querySelector('.left.wing');
   var rightWing = butterfly.querySelector('.right.wing');
   var wingFlapDuration = 0.2 + Math.random() * 0.1;
@@ -102,6 +123,7 @@
         new Animation(rightWing, [{transform: 'rotateY(45deg)'}, {transform: 'rotateY(-90deg)'}], {duration: wingFlapDuration, easing: 'ease-in'}),
       ]),
     ], {iterations: Infinity, iterationStart: Math.random()}));
-});
+}
 
+colours.forEach(createButterfly);
 </script>
