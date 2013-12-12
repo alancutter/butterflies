@@ -1,7 +1,7 @@
 <!doctype html>
 <style>
 #glasshouse {
-  -webkit-perspective: 4000px;
+  -webkit-perspective: 1000px;
   perspective: 4000px;
   width: 100vw;
   height: 100vh;
@@ -69,35 +69,51 @@
 <script src="web-animations.js"></script>
 <script>
 'use strict';
-var transformProperty = 'webkitTransform' in document.documentElement.style ? 'webkitTransform' : 'transform';
-
 var colours = ['red', 'yellow', 'green', 'blue'];
+
+function random(x) {
+  return Math.random() * x;
+}
 
 function deviate(x) {
   return 2 * Math.random() * x - x;
 }
 
-function createButterflyAnimation(colour, x, y) {
+function maybe() {
+  return Math.random() < 0.5;
+}
+
+function createButterflyAnimation(colour, x, y, targetX, targetY) {
   var butterfly = butterflyTemplate.content.childNodes[1].cloneNode();
   mapDomElements(butterfly, function(div) { div.classList.add(colour); });
   glasshouse.appendChild(butterfly);
-  butterfly.querySelector('.translation').style[transformProperty] = 'translate(' + x + 'px, ' + y + 'px)';
-  butterfly.querySelector('.rotation').style[transformProperty] = 'rotateY(' + deviate(90) + 'deg) rotateX(' + (45 + deviate(20)) + 'deg)';
+  var translation = butterfly.querySelector('.translation');
+  var rotation = butterfly.querySelector('.rotation');
   var body = butterfly.querySelector('.body');
   var leftWing = butterfly.querySelector('.left.wing');
   var rightWing = butterfly.querySelector('.right.wing');
   var wingFlapDuration = 0.2 + Math.random() * 0.1;
   var player = document.timeline.play(
     new ParGroup([
-      new SeqGroup([
-        new Animation(leftWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(-225deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
-        new Animation(leftWing, [{transform: 'rotateY(-225deg)'}, {transform: 'rotateY(-90deg)'}], {duration: wingFlapDuration, easing: 'ease-in'}),
-      ]),
-      new SeqGroup([
-        new Animation(rightWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(45deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
-        new Animation(rightWing, [{transform: 'rotateY(45deg)'}, {transform: 'rotateY(-90deg)'}], {duration: wingFlapDuration, easing: 'ease-in'}),
-      ]),
-    ], {iterations: Infinity, iterationStart: Math.random()}));
+        new Animation(translation, [
+            {transform: 'translate3d(' + x + 'px, ' + y + 'px, -1000px)'},
+            {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + (maybe() ? 2000 : -4000) + 'px)'},
+          ], 3),
+        new Animation(rotation, [
+            {transform: 'rotateY(' + deviate(360) + 'deg) rotateX(' + random(90) + 'deg)'},
+            {transform: 'rotateY(' + deviate(360) + 'deg) rotateX(' + random(90) + 'deg)'},
+          ], {duration: 1, easing: 'ease-out'}),
+        new ParGroup([
+            new SeqGroup([
+                new Animation(leftWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(-225deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
+                new Animation(leftWing, [{transform: 'rotateY(-225deg)'}, {transform: 'rotateY(-90deg)'}], {duration: wingFlapDuration, easing: 'ease-in'}),
+              ]),
+            new SeqGroup([
+                new Animation(rightWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(45deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
+                new Animation(rightWing, [{transform: 'rotateY(45deg)'}, {transform: 'rotateY(-90deg)'}], {duration: wingFlapDuration, easing: 'ease-in'}),
+              ]),
+          ], {iterations: Infinity, iterationStart: Math.random()}),
+      ]));
   return player;
 }
 
@@ -110,6 +126,9 @@ function mapDomElements(element, func) {
 
 
 window.addEventListener('mousedown', function(event) {
-  createButterflyAnimation(colours[parseInt(Math.random() * 4)], event.clientX, event.clientY);
+  createButterflyAnimation(
+      colours[parseInt(Math.random() * 4)],
+      event.clientX, event.clientY,
+      innerWidth - event.clientX, innerHeight - event.clientY);
 });
 </script>
