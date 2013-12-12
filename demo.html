@@ -1,15 +1,19 @@
 <!doctype html>
 <style>
 #glasshouse {
-  -webkit-perspective: 600px;
-  perspective: 600px;
+  -webkit-perspective: 4000px;
+  perspective: 4000px;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: -20px;
 }
-.translated {
+.translation {
   position: absolute;
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
 }
-.rotated {
+.rotation {
   position: absolute;
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
@@ -46,48 +50,16 @@
 .green.wing { background-position: -500px 0; }
 .blue.body { background-position: -600px 0; }
 .blue.wing { background-position: -700px 0; }
-
-.red.translated {
-  -webkit-transform: translate(160px, 150px);
-  transform: translate(160px, 150px);
-}
-.yellow.translated {
-  -webkit-transform: translate(300px, 250px);
-  transform: translate(300px, 250px);
-}
-.green.translated {
-  -webkit-transform: translate(150px, 300px);
-  transform: translate(150px, 300px);
-}
-.blue.translated {
-  -webkit-transform: translate(200px, 240px);
-  transform: translate(200px, 240px);
-}
-
-.red.rotated {
-  -webkit-transform: rotateY(-45deg) rotateX(60deg);
-  transform: rotateY(-45deg) rotateX(60deg);
-}
-.yellow.rotated {
-  -webkit-transform: rotateY(35deg) rotateX(60deg);
-  transform: rotateY(35deg) rotateX(60deg);
-}
-.green.rotated {
-  -webkit-transform: rotateY(-10deg) rotateX(70deg);
-  transform: rotateY(-10deg) rotateX(70deg);
-}
-.blue.rotated {
-  -webkit-transform: rotateY(200deg) rotateX(40deg);
-  transform: rotateY(200deg) rotateX(40deg);
-}
 </style>
 
 <template id="butterflyTemplate">
-  <div class="translated">
-    <div class="rotated">
+  <div class="butterfly">
+    <div class="translation">
+      <div class="rotation">
         <div class="body"></div>
         <div class="wing left"></div>
         <div class="wing right"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -96,23 +68,22 @@
 
 <script src="web-animations.js"></script>
 <script>
+'use strict';
+var transformProperty = 'webkitTransform' in document.documentElement.style ? 'webkitTransform' : 'transform';
+
 var colours = ['red', 'yellow', 'green', 'blue'];
 
-function mapDomElements(element, func) {
-  func(element);
-  for (var i = 0; i < element.children.length; i++) {
-    mapDomElements(element.children[i], func);
-  }
-}
-
-function createButterfly(colour) {
+function createButterflyAnimation(colour, x, y) {
   var butterfly = butterflyTemplate.content.childNodes[1].cloneNode();
   mapDomElements(butterfly, function(div) { div.classList.add(colour); });
   glasshouse.appendChild(butterfly);
+  butterfly.querySelector('.translation').style[transformProperty] = 'translate(' + x + 'px, ' + y + 'px)';
+  butterfly.querySelector('.rotation').style[transformProperty] = 'rotateY(' + (Math.random() * 90 - 45) + 'deg) rotateX(45deg)';
+  var body = butterfly.querySelector('.body');
   var leftWing = butterfly.querySelector('.left.wing');
   var rightWing = butterfly.querySelector('.right.wing');
   var wingFlapDuration = 0.2 + Math.random() * 0.1;
-  document.timeline.play(
+  var player = document.timeline.play(
     new ParGroup([
       new SeqGroup([
         new Animation(leftWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(-225deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
@@ -123,7 +94,18 @@ function createButterfly(colour) {
         new Animation(rightWing, [{transform: 'rotateY(45deg)'}, {transform: 'rotateY(-90deg)'}], {duration: wingFlapDuration, easing: 'ease-in'}),
       ]),
     ], {iterations: Infinity, iterationStart: Math.random()}));
+  return player;
 }
 
-colours.forEach(createButterfly);
+function mapDomElements(element, func) {
+  for (var i = 0; i < element.children.length; i++) {
+    mapDomElements(element.children[i], func);
+  }
+  func(element);
+}
+
+
+window.addEventListener('mousedown', function(event) {
+  createButterflyAnimation('yellow', event.clientX, event.clientY);
+});
 </script>
