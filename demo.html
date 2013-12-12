@@ -73,12 +73,16 @@ var transformProperty = 'webkitTransform' in document.documentElement.style ? 'w
 
 var colours = ['red', 'yellow', 'green', 'blue'];
 
+function deviate(x) {
+  return 2 * Math.random() * x - x;
+}
+
 function createButterflyAnimation(colour, x, y) {
   var butterfly = butterflyTemplate.content.childNodes[1].cloneNode();
   mapDomElements(butterfly, function(div) { div.classList.add(colour); });
   glasshouse.appendChild(butterfly);
   butterfly.querySelector('.translation').style[transformProperty] = 'translate(' + x + 'px, ' + y + 'px)';
-  butterfly.querySelector('.rotation').style[transformProperty] = 'rotateY(' + (Math.random() * 90 - 45) + 'deg) rotateX(45deg)';
+  butterfly.querySelector('.rotation').style[transformProperty] = 'rotateY(' + deviate(90) + 'deg) rotateX(' + (45 + deviate(20)) + 'deg)';
   var body = butterfly.querySelector('.body');
   var leftWing = butterfly.querySelector('.left.wing');
   var rightWing = butterfly.querySelector('.right.wing');
@@ -106,6 +110,6 @@ function mapDomElements(element, func) {
 
 
 window.addEventListener('mousedown', function(event) {
-  createButterflyAnimation('yellow', event.clientX, event.clientY);
+  createButterflyAnimation(colours[parseInt(Math.random() * 4)], event.clientX, event.clientY);
 });
 </script>
