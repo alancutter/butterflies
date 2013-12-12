@@ -56,9 +56,11 @@
   <div class="butterfly">
     <div class="translation">
       <div class="rotation">
-        <div class="body"></div>
-        <div class="wing left"></div>
-        <div class="wing right"></div>
+        <div class="scale">
+          <div class="body"></div>
+          <div class="wing left"></div>
+          <div class="wing right"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -93,16 +95,18 @@ function createButterflyAnimation(colour, x, y, targetX, targetY) {
   var leftWing = butterfly.querySelector('.left.wing');
   var rightWing = butterfly.querySelector('.right.wing');
   var wingFlapDuration = 0.2 + Math.random() * 0.1;
+  var z = 0;
+  var targetZ = deviate(1000); //maybe() ? 1000 : -1000;
   var player = document.timeline.play(
     new ParGroup([
         new Animation(translation, [
-            {transform: 'translate3d(' + x + 'px, ' + y + 'px, -1000px)'},
-            {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + (maybe() ? 2000 : -4000) + 'px)'},
+            {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
+            {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
           ], 3),
         new Animation(rotation, [
             {transform: 'rotateY(' + deviate(360) + 'deg) rotateX(' + random(90) + 'deg)'},
-            {transform: 'rotateY(' + deviate(360) + 'deg) rotateX(' + random(90) + 'deg)'},
-          ], {duration: 1, easing: 'ease-out'}),
+            {transform: 'rotateY(' + Math.atan2(x - targetX, z - targetZ) + 'rad) rotateX(' + (30 + random(60)) + 'deg)'},
+          ], {duration: 2, easing: 'cubic-bezier(0,0,0,1)'}),
         new ParGroup([
             new SeqGroup([
                 new Animation(leftWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(-225deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
@@ -125,7 +129,7 @@ function mapDomElements(element, func) {
 }
 
 
-window.addEventListener('mousedown', function(event) {
+window.addEventListener('mousemove', function(event) {
   createButterflyAnimation(
       colours[parseInt(Math.random() * 4)],
       event.clientX, event.clientY,
