@@ -105,20 +105,19 @@ body {
 <script src="web-animations.js"></script>
 <script>
 'use strict';
-var colours = ['red', 'yellow', 'green', 'blue'];
 var perspectiveDistance = innerWidth / 2;
-var logoRadius = 128;
+var logoRadius = 100;
+var maxButterflies = 150;
+var butterflyAnimations;
 
 function random(x) {
   return Math.random() * x;
 }
-
 function deviate(x) {
   return 2 * Math.random() * x - x;
 }
-
-function maybe() {
-  return Math.random() < 0.5;
+function deviateMidBias(x) {
+  return (Math.random() + Math.random() - 1) * x;
 }
 
 function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
@@ -128,21 +127,31 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
   var translation = butterfly.querySelector('.translation');
   var rotation = butterfly.querySelector('.rotation');
   var scale = butterfly.querySelector('.scale');
-  scale.style.webkitTransform = 'scale3d(0.25, 0.25, 0.25)';
   var body = butterfly.querySelector('.body');
   var leftWing = butterfly.querySelector('.left.wing');
   var rightWing = butterfly.querySelector('.right.wing');
   var wingFlapDuration = 0.2 + random(0.1);
   var player = document.timeline.play(
     new ParGroup([
-        new Animation(translation, [
-            {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
-            {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
-          ], 3),
+        new SeqGroup([
+            new Animation(translation, [
+                {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
+                {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
+              ], {duration: 8, easing: 'cubic-bezier(0, 0.125, 1, 1)'}),
+            new ParGroup([
+                new Animation(body, [{opacity: '1'},{opacity: '0'}], 2),
+                new Animation(leftWing, [{opacity: '1'},{opacity: '0'}], 2),
+                new Animation(rightWing, [{opacity: '1'},{opacity: '0'}], 2),
+              ], {delay: -2 + deviate(1)}),
+          ]),
+        new Animation(scale, [
+            {transform: 'scale3d(0.01, 0.01, 0.01)'},
+            {transform: 'scale3d(0.25, 0.25, 0.25)'},
+          ], {duration: 0.5, easing: 'ease-out'}),
         new Animation(rotation, [
             {transform: 'rotateY(' + deviate(360) + 'deg) rotateX(' + random(90) + 'deg)'},
             {transform: 'rotateY(' + Math.atan2(x - targetX, z - targetZ) + 'rad) rotateX(' + (30 + random(60)) + 'deg)'},
-          ], {duration: 1, easing: 'cubic-bezier(0,0,0,1)'}),
+          ], {duration: 1, easing: 'cubic-bezier(0, 0, 0, 1)'}),
         new ParGroup([
             new SeqGroup([
                 new Animation(leftWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(-225deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
@@ -154,7 +163,10 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
               ]),
           ], {iterations: Infinity, iterationStart: Math.random()}),
       ]));
-  return player;
+  return {
+    element: butterfly,
+    player: player,
+  };
 }
 
 function mapDomElements(element, func) {
@@ -164,26 +176,58 @@ function mapDomElements(element, func) {
   func(element);
 }
 
+function loadButterflyAnimations() {
+  butterflyAnimations = [];
+  for (var i = 0; i < maxButterflies; i++) {
+    var circleAngle = random(2 * Math.PI);
+    var circleRadius = random(1) + random(1);
+    if (circleRadius > 1) {
+      circleRadius = 2 - circleRadius;
+    }
+    var x = Math.cos(circleAngle);
+    var y = Math.sin(circleAngle);
+    var colour = 'red'
+    if (circleRadius < 0.4) {
+      colour = 'blue'
+    } else if (y > -0.7 && x > 0) {
+      colour = 'yellow';
+    } else if (y > x * 0.4) {
+      colour = 'green';
+    }
+    circleRadius *= logoRadius;
+    x *= circleRadius;
+    y *= circleRadius;
+    var destinationAngle = random(2 * Math.PI);
+    var distance = perspectiveDistance * (0.75 + random(0.5));
+    var butterflyAnimation = createButterflyAnimation(
+        colour,
+        innerWidth / 2 + x, innerHeight / 2 + y, 0,
+        innerWidth / 2 + Math.cos(destinationAngle) * distance, innerHeight / 2 + deviateMidBias(distance), Math.sin(destinationAngle) * distance);
+    butterflyAnimation.player.paused = true;
+    butterflyAnimations.push(butterflyAnimation);
+  }
+}
+loadButterflyAnimations();
+glasshouse.style.visibility = 'hidden';
 
 function updatePerspectiveOrigin() {
   document.body.style.webkitPerspectiveOrigin = (innerWidth / 2) + 'px ' + (innerHeight / 2) + 'px';
 }
-
 window.addEventListener('load', function(event) {
   document.body.style.webkitPerspective = perspectiveDistance + 'px';
   updatePerspectiveOrigin();
 });
 window.addEventListener('resize', updatePerspectiveOrigin);
 
-window.addEventListener('mouseup', function(event) {
-  var angle = random(2 * Math.PI);
-  var distance = perspectiveDistance * (0.75 - random(0.1));
-  createButterflyAnimation(
-      colours[parseInt(Math.random() * 4)],
-      innerWidth / 2, innerHeight / 2, 0,
-      innerWidth / 2 + Math.cos(angle) * distance, innerHeight / 2 + deviate(distance), Math.sin(angle) * distance);
+chromeButton.addEventListener('click', function(event) {
+  chromeButton.animate([{offset: 0, opacity: 1}, {offset: 1, opacity: 0, visibility: 'visible'}, {offset: 1, visibility: 'hidden'}], 0.5);
+  glasshouse.style.visibility = 'visible';
+  butterflyAnimations.forEach(function(butterflyAnimation) {
+    butterflyAnimation.player.paused = false;
+  });
 });
+
 window.addEventListener('mousemove', function(event) {
-  glasshouse.style.webkitTransform = 'rotateY(' + ((event.clientX - innerWidth / 2) * 0.25) + 'deg)';
+  glasshouse.style.webkitTransform = 'rotateX(' + (-Math.atan((event.clientY / innerHeight - 0.5) * 2) / 2) + 'rad) rotateY(' + ((event.clientX - innerWidth / 2) * 0.25) + 'deg)';
 });
 </script>
