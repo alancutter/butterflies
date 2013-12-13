@@ -112,7 +112,7 @@ var perspectiveDistance = innerWidth / 2;
 var logoRadius = 50;
 var maxButterflies = 100;
 var butterflyAnimations;
-var completedButterflyAnimations;
+var armed = false;
 
 function random(x) {
   return Math.random() * x;
@@ -183,7 +183,6 @@ function mapDomElements(element, func) {
 function loadButterflyAnimations() {
   glasshouse.style.display = 'none';
   butterflyAnimations = [];
-  completedButterflyAnimations = 0;
   for (var i = 0; i < maxButterflies; i++) {
     var circleAngle = random(2 * Math.PI);
     var circleRadius = Math.random() + Math.random();
@@ -216,6 +215,7 @@ function loadButterflyAnimations() {
     butterflyAnimation.player.paused = true;
     butterflyAnimations.push(butterflyAnimation);
   }
+  armed = true;
 }
 
 function updatePerspectiveOrigin() {
@@ -237,11 +237,15 @@ window.addEventListener('mousemove', function(event) {
 });
 
 chromeButton.addEventListener('click', function(event) {
+  if (!armed) {
+    return;
+  }
   chromeButton.style.opacity = 0;
   glasshouse.style.display = 'block';
   butterflyAnimations.forEach(function(butterflyAnimation) {
     butterflyAnimation.player.paused = false;
   });
+  armed = false;
   setTimeout(function() {
     butterflyAnimations.forEach(function(butterflyAnimation) {
       butterflyAnimation.player.source = null;
