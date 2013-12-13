@@ -4,10 +4,26 @@ body {
   width: 100vw;
   height: 100vh;
   padding: 0;
-  margin: -20px;
+  margin: 0px;
   position: absolute;
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
+}
+#chromeButton {
+  position: absolute;
+  left: calc(50% - 128px);
+  top: calc(50% - 128px);
+  background-image: url(chrome_logo.png);
+  background-size: cover;
+  width: 256px;
+  height: 256px;
+  -webkit-transition: -webkit-transform 0.1s;
+}
+#chromeButton:hover {
+  -webkit-transform: scale(1.05, 1.05);
+}
+#chromeButton:active {
+  -webkit-transform: scale(0.9, 0.9);
 }
 #glasshouse {
   position: absolute;
@@ -16,7 +32,6 @@ body {
   width: 100vw;
   height: 100vh;
   padding: 0;
-  margin: -20px;
   position: absolute;
 }
 .translation {
@@ -84,6 +99,7 @@ body {
   </div>
 </template>
 
+<div id="chromeButton"></div>
 <div id="glasshouse"></div>
 
 <script src="web-animations.js"></script>
@@ -91,6 +107,7 @@ body {
 'use strict';
 var colours = ['red', 'yellow', 'green', 'blue'];
 var perspectiveDistance = innerWidth / 2;
+var logoRadius = 128;
 
 function random(x) {
   return Math.random() * x;
@@ -158,13 +175,15 @@ window.addEventListener('load', function(event) {
 });
 window.addEventListener('resize', updatePerspectiveOrigin);
 
-window.addEventListener('mousemove', function(event) {
+window.addEventListener('mouseup', function(event) {
   var angle = random(2 * Math.PI);
   var distance = perspectiveDistance * (0.75 - random(0.1));
   createButterflyAnimation(
       colours[parseInt(Math.random() * 4)],
       innerWidth / 2, innerHeight / 2, 0,
       innerWidth / 2 + Math.cos(angle) * distance, innerHeight / 2 + deviate(distance), Math.sin(angle) * distance);
-  glasshouse.style.webkitTransform = 'rotateY(' + ((event.clientX - innerWidth / 2) * 0.25)+ 'deg)';
+});
+window.addEventListener('mousemove', function(event) {
+  glasshouse.style.webkitTransform = 'rotateY(' + ((event.clientX - innerWidth / 2) * 0.25) + 'deg)';
 });
 </script>
