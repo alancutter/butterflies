@@ -11,12 +11,12 @@ body {
 }
 #chromeButton {
   position: absolute;
-  left: calc(50% - 256px);
-  top: calc(50% - 256px);
+  left: calc(50% - 150px);
+  top: calc(50% - 150px);
   background-image: url(chrome_logo.png);
   background-size: cover;
-  width: 512px;
-  height: 512px;
+  width: 300px;
+  height: 300px;
   -webkit-transition: -webkit-transform 0.1s;
 }
 #chromeButton:hover {
@@ -106,7 +106,7 @@ body {
 <script>
 'use strict';
 var perspectiveDistance = innerWidth / 2;
-var logoRadius = 256;
+var logoRadius = 50;
 var maxButterflies = 100;
 var butterflyAnimations;
 var armed = true;
@@ -135,7 +135,7 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ, ca
   var translationAnimation = new Animation(translation, [
       {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
       {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
-    ], {duration: 6, easing: 'cubic-bezier(0, 0.25, 1, 1)'});
+    ], {duration: 7 + deviate(1), easing: 'cubic-bezier(0, 0.5, 1, 1)'});
   var player = document.timeline.play(
     new ParGroup([
         new SeqGroup([
@@ -144,16 +144,16 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ, ca
                 new Animation(body, [{opacity: '1'},{opacity: '0'}], 2),
                 new Animation(leftWing, [{opacity: '1'},{opacity: '0'}], 2),
                 new Animation(rightWing, [{opacity: '1'},{opacity: '0'}], 2),
-              ], {delay: -2 + deviate(1)}),
+              ], {delay: -2}),
           ]),
         new Animation(scale, [
-            {transform: 'scale3d(0.25, 0.25, 0.25)'},
-            {transform: 'scale3d(0.5, 0.5, 0.5)'},
-          ], {duration: 1, easing: 'ease-out'}),
+            {transform: 'scale3d(0.2, 0.2, 0.2)'},
+            {transform: 'scale3d(0.35, 0.35, 0.35)'},
+          ], 1),
         new Animation(rotation, [
-            {transform: 'rotateY(' + (0) + 'deg) rotateX(0deg)'},
+            {transform: 'rotateY(' + deviate(360) + 'deg) rotateX(0deg)'},
             {transform: 'rotateY(' + Math.atan2(x - targetX, z - targetZ) + 'rad) rotateX(' + (30 + random(60)) + 'deg)'},
-          ], {duration: 4, easing: 'cubic-bezier(0, 0, 0, 1)'}),
+          ], {duration: 2, easing: 'cubic-bezier(0, 0, 0, 1)'}),
         new ParGroup([
             new SeqGroup([
                 new Animation(leftWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(-225deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
@@ -188,9 +188,9 @@ function loadButterflyAnimations() {
     }
     var x = Math.cos(circleAngle);
     var y = Math.sin(circleAngle);
-    var colour = 'red'
-    if (circleRadius < 0.4) {
-      colour = 'blue'
+    var colour = 'red';
+    if (circleRadius < 0.45) {
+      colour = 'blue';
     } else if (y > -0.7 && x > 0) {
       colour = 'yellow';
     } else if (y > x * 0.4) {
@@ -199,12 +199,16 @@ function loadButterflyAnimations() {
     circleRadius *= logoRadius;
     x *= circleRadius;
     y *= circleRadius;
-    var destinationAngle = random(2 * Math.PI);
-    var distance = perspectiveDistance * (0.75 + random(0.5));
+    var destinationAngle = deviate(Math.PI);
+    if ((destinationAngle > 0 && colour == 'green') || (destinationAngle < 0 && colour == 'yellow')) {
+      destinationAngle *= -1;
+    }
+    var distance = perspectiveDistance * (0.5 + random(colour == 'blue' ? 0.1 : 0.75));
+    var height = colour == 'red' ? -random(distance) : deviateMidBias(distance);
     var butterflyAnimation = createButterflyAnimation(
         colour,
         innerWidth / 2 + x, innerHeight / 2 + y, 0,
-        innerWidth / 2 + Math.cos(destinationAngle) * distance, innerHeight / 2 + deviateMidBias(distance), Math.sin(destinationAngle) * distance);
+        innerWidth / 2 + Math.sin(destinationAngle) * distance, innerHeight / 2 + height, Math.cos(destinationAngle) * distance);
     butterflyAnimation.player.paused = true;
     butterflyAnimations.push(butterflyAnimation);
   }
