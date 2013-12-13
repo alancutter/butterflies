@@ -109,6 +109,7 @@ var perspectiveDistance = innerWidth / 2;
 var logoRadius = 100;
 var maxButterflies = 150;
 var butterflyAnimations;
+var armed = true;
 
 function random(x) {
   return Math.random() * x;
@@ -120,7 +121,7 @@ function deviateMidBias(x) {
   return (Math.random() + Math.random() - 1) * x;
 }
 
-function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
+function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ, callback) {
   var butterfly = butterflyTemplate.content.childNodes[1].cloneNode();
   mapDomElements(butterfly, function(div) { div.classList.add(colour); });
   glasshouse.appendChild(butterfly);
@@ -131,13 +132,14 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
   var leftWing = butterfly.querySelector('.left.wing');
   var rightWing = butterfly.querySelector('.right.wing');
   var wingFlapDuration = 0.2 + random(0.1);
+  var translationAnimation = new Animation(translation, [
+      {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
+      {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
+    ], {duration: 8, easing: 'cubic-bezier(0, 0.125, 1, 1)'});
   var player = document.timeline.play(
     new ParGroup([
         new SeqGroup([
-            new Animation(translation, [
-                {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
-                {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
-              ], {duration: 8, easing: 'cubic-bezier(0, 0.125, 1, 1)'}),
+            translationAnimation,
             new ParGroup([
                 new Animation(body, [{opacity: '1'},{opacity: '0'}], 2),
                 new Animation(leftWing, [{opacity: '1'},{opacity: '0'}], 2),
