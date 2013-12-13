@@ -1,12 +1,23 @@
 <!doctype html>
 <style>
-#glasshouse {
-  -webkit-perspective: 1000px;
-  perspective: 4000px;
+body {
   width: 100vw;
   height: 100vh;
   padding: 0;
   margin: -20px;
+  position: absolute;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+#glasshouse {
+  position: absolute;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: -20px;
+  position: absolute;
 }
 .translation {
   position: absolute;
@@ -19,6 +30,13 @@
   transform-style: preserve-3d;
   left: 0;
   top: -125px;
+  -webkit-transform-origin: 0 125px;
+  transform-origin: 0 125px;
+}
+.scale {
+  position: absolute;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
   -webkit-transform-origin: 0 125px;
   transform-origin: 0 125px;
 }
@@ -72,6 +90,7 @@
 <script>
 'use strict';
 var colours = ['red', 'yellow', 'green', 'blue'];
+var perspectiveDistance = innerWidth / 2;
 
 function random(x) {
   return Math.random() * x;
@@ -85,18 +104,18 @@ function maybe() {
   return Math.random() < 0.5;
 }
 
-function createButterflyAnimation(colour, x, y, targetX, targetY) {
+function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
   var butterfly = butterflyTemplate.content.childNodes[1].cloneNode();
   mapDomElements(butterfly, function(div) { div.classList.add(colour); });
   glasshouse.appendChild(butterfly);
   var translation = butterfly.querySelector('.translation');
   var rotation = butterfly.querySelector('.rotation');
+  var scale = butterfly.querySelector('.scale');
+  scale.style.webkitTransform = 'scale3d(0.25, 0.25, 0.25)';
   var body = butterfly.querySelector('.body');
   var leftWing = butterfly.querySelector('.left.wing');
   var rightWing = butterfly.querySelector('.right.wing');
-  var wingFlapDuration = 0.2 + Math.random() * 0.1;
-  var z = 0;
-  var targetZ = deviate(1000); //maybe() ? 1000 : -1000;
+  var wingFlapDuration = 0.2 + random(0.1);
   var player = document.timeline.play(
     new ParGroup([
         new Animation(translation, [
@@ -106,7 +125,7 @@ function createButterflyAnimation(colour, x, y, targetX, targetY) {
         new Animation(rotation, [
             {transform: 'rotateY(' + deviate(360) + 'deg) rotateX(' + random(90) + 'deg)'},
             {transform: 'rotateY(' + Math.atan2(x - targetX, z - targetZ) + 'rad) rotateX(' + (30 + random(60)) + 'deg)'},
-          ], {duration: 2, easing: 'cubic-bezier(0,0,0,1)'}),
+          ], {duration: 1, easing: 'cubic-bezier(0,0,0,1)'}),
         new ParGroup([
             new SeqGroup([
                 new Animation(leftWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(-225deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
@@ -129,10 +148,23 @@ function mapDomElements(element, func) {
 }
 
 
+function updatePerspectiveOrigin() {
+  document.body.style.webkitPerspectiveOrigin = (innerWidth / 2) + 'px ' + (innerHeight / 2) + 'px';
+}
+
+window.addEventListener('load', function(event) {
+  document.body.style.webkitPerspective = perspectiveDistance + 'px';
+  updatePerspectiveOrigin();
+});
+window.addEventListener('resize', updatePerspectiveOrigin);
+
 window.addEventListener('mousemove', function(event) {
+  var angle = random(2 * Math.PI);
+  var distance = perspectiveDistance * (0.75 - random(0.1));
   createButterflyAnimation(
       colours[parseInt(Math.random() * 4)],
-      event.clientX, event.clientY,
-      innerWidth - event.clientX, innerHeight - event.clientY);
+      innerWidth / 2, innerHeight / 2, 0,
+      innerWidth / 2 + Math.cos(angle) * distance, innerHeight / 2 + deviate(distance), Math.sin(angle) * distance);
+  glasshouse.style.webkitTransform = 'rotateY(' + ((event.clientX - innerWidth / 2) * 0.25)+ 'deg)';
 });
 </script>
