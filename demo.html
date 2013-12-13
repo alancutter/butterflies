@@ -11,12 +11,12 @@ body {
 }
 #chromeButton {
   position: absolute;
-  left: calc(50% - 128px);
-  top: calc(50% - 128px);
+  left: calc(50% - 256px);
+  top: calc(50% - 256px);
   background-image: url(chrome_logo.png);
   background-size: cover;
-  width: 256px;
-  height: 256px;
+  width: 512px;
+  height: 512px;
   -webkit-transition: -webkit-transform 0.1s;
 }
 #chromeButton:hover {
@@ -106,8 +106,8 @@ body {
 <script>
 'use strict';
 var perspectiveDistance = innerWidth / 2;
-var logoRadius = 100;
-var maxButterflies = 150;
+var logoRadius = 256;
+var maxButterflies = 100;
 var butterflyAnimations;
 var armed = true;
 
@@ -135,7 +135,7 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ, ca
   var translationAnimation = new Animation(translation, [
       {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
       {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
-    ], {duration: 8, easing: 'cubic-bezier(0, 0.125, 1, 1)'});
+    ], {duration: 6, easing: 'cubic-bezier(0, 0.25, 1, 1)'});
   var player = document.timeline.play(
     new ParGroup([
         new SeqGroup([
@@ -147,13 +147,13 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ, ca
               ], {delay: -2 + deviate(1)}),
           ]),
         new Animation(scale, [
-            {transform: 'scale3d(0.01, 0.01, 0.01)'},
             {transform: 'scale3d(0.25, 0.25, 0.25)'},
-          ], {duration: 0.5, easing: 'ease-out'}),
+            {transform: 'scale3d(0.5, 0.5, 0.5)'},
+          ], {duration: 1, easing: 'ease-out'}),
         new Animation(rotation, [
-            {transform: 'rotateY(' + deviate(360) + 'deg) rotateX(' + random(90) + 'deg)'},
+            {transform: 'rotateY(' + (0) + 'deg) rotateX(0deg)'},
             {transform: 'rotateY(' + Math.atan2(x - targetX, z - targetZ) + 'rad) rotateX(' + (30 + random(60)) + 'deg)'},
-          ], {duration: 1, easing: 'cubic-bezier(0, 0, 0, 1)'}),
+          ], {duration: 4, easing: 'cubic-bezier(0, 0, 0, 1)'}),
         new ParGroup([
             new SeqGroup([
                 new Animation(leftWing, [{transform: 'rotateY(-90deg)'}, {transform: 'rotateY(-225deg)'}], {duration: wingFlapDuration, easing: 'ease-out'}),
