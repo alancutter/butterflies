@@ -181,7 +181,7 @@ function mapDomElements(element, func) {
 }
 
 function loadButterflyAnimations() {
-  glasshouse.style.visibility = 'hidden';
+  glasshouse.style.display = 'none';
   butterflyAnimations = [];
   completedButterflyAnimations = 0;
   for (var i = 0; i < maxButterflies; i++) {
@@ -238,7 +238,7 @@ window.addEventListener('mousemove', function(event) {
 
 chromeButton.addEventListener('click', function(event) {
   chromeButton.style.opacity = 0;
-  glasshouse.style.visibility = 'visible';
+  glasshouse.style.display = 'block';
   butterflyAnimations.forEach(function(butterflyAnimation) {
     butterflyAnimation.player.paused = false;
   });
