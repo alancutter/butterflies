@@ -17,8 +17,8 @@ body {
   background-size: cover;
   width: 300px;
   height: 300px;
-  -webkit-transition: -webkit-transform 0.1s;
-  transition: transform 0.1s;
+  -webkit-transition: -webkit-transform 0.1s, opacity 1s;
+  transition: transform 0.1s, opacity 1s;
 }
 #chromeButton:hover {
   -webkit-transform: scale(1.05, 1.05);
@@ -112,7 +112,7 @@ var perspectiveDistance = innerWidth / 2;
 var logoRadius = 50;
 var maxButterflies = 100;
 var butterflyAnimations;
-var armed = true;
+var completedButterflyAnimations;
 
 function random(x) {
   return Math.random() * x;
@@ -124,7 +124,7 @@ function deviateMidBias(x) {
   return (Math.random() + Math.random() - 1) * x;
 }
 
-function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ, callback) {
+function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
   var butterfly = butterflyTemplate.content.childNodes[1].cloneNode();
   mapDomElements(butterfly, function(div) { div.classList.add(colour); });
   glasshouse.appendChild(butterfly);
@@ -135,18 +135,17 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ, ca
   var leftWing = butterfly.querySelector('.left.wing');
   var rightWing = butterfly.querySelector('.right.wing');
   var wingFlapDuration = 0.2 + random(0.1);
-  var translationAnimation = new Animation(translation, [
-      {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
-      {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
-    ], {duration: 7 + deviate(1), easing: 'cubic-bezier(0, 0.5, 1, 1)'});
   var player = document.timeline.play(
     new ParGroup([
         new SeqGroup([
-            translationAnimation,
+            new Animation(translation, [
+                {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
+                {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
+              ], {duration: 7 + deviate(1), easing: 'cubic-bezier(0, 0.5, 1, 1)'}),
             new ParGroup([
-                new Animation(body, [{opacity: '1'},{opacity: '0'}], 2),
-                new Animation(leftWing, [{opacity: '1'},{opacity: '0'}], 2),
-                new Animation(rightWing, [{opacity: '1'},{opacity: '0'}], 2),
+                new Animation(body, [{opacity: '1'}, {opacity: '0'}], 2),
+                new Animation(leftWing, [{opacity: '1'}, {opacity: '0'}], 2),
+                new Animation(rightWing, [{opacity: '1'}, {opacity: '0'}], 2),
               ], {delay: -2}),
           ]),
         new Animation(scale, [
@@ -182,10 +181,12 @@ function mapDomElements(element, func) {
 }
 
 function loadButterflyAnimations() {
+  glasshouse.style.visibility = 'hidden';
   butterflyAnimations = [];
+  completedButterflyAnimations = 0;
   for (var i = 0; i < maxButterflies; i++) {
     var circleAngle = random(2 * Math.PI);
-    var circleRadius = random(1) + random(1);
+    var circleRadius = Math.random() + Math.random();
     if (circleRadius > 1) {
       circleRadius = 2 - circleRadius;
     }
@@ -216,8 +217,6 @@ function loadButterflyAnimations() {
     butterflyAnimations.push(butterflyAnimation);
   }
 }
-loadButterflyAnimations();
-glasshouse.style.visibility = 'hidden';
 
 function updatePerspectiveOrigin() {
   var origin = (innerWidth / 2) + 'px ' + (innerHeight / 2) + 'px';
@@ -231,17 +230,27 @@ window.addEventListener('load', function(event) {
 });
 window.addEventListener('resize', updatePerspectiveOrigin);
 
-chromeButton.addEventListener('click', function(event) {
-  chromeButton.animate([{offset: 0, opacity: 1}, {offset: 1, opacity: 0, visibility: 'visible'}, {offset: 1, visibility: 'hidden'}], 0.5);
-  glasshouse.style.visibility = 'visible';
-  butterflyAnimations.forEach(function(butterflyAnimation) {
-    butterflyAnimation.player.paused = false;
-  });
-});
-
 window.addEventListener('mousemove', function(event) {
   var transform = 'rotateX(' + (-Math.atan((event.clientY / innerHeight - 0.5) * 2) / 2) + 'rad) rotateY(' + ((event.clientX - innerWidth / 2) * 0.25) + 'deg)'
   glasshouse.style.webkitTransform = transform;
   glasshouse.style.transform = transform;
 });
+
+chromeButton.addEventListener('click', function(event) {
+  chromeButton.style.opacity = 0;
+  glasshouse.style.visibility = 'visible';
+  butterflyAnimations.forEach(function(butterflyAnimation) {
+    butterflyAnimation.player.paused = false;
+  });
+  setTimeout(function() {
+    butterflyAnimations.forEach(function(butterflyAnimation) {
+      butterflyAnimation.player.source = null;
+      butterflyAnimation.element.remove();
+    });
+    chromeButton.style.opacity = 1;
+    loadButterflyAnimations();
+  }, 8000);
+});
+
+window.addEventListener('load', loadButterflyAnimations);
 </script>
