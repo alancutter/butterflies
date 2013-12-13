@@ -18,12 +18,15 @@ body {
   width: 300px;
   height: 300px;
   -webkit-transition: -webkit-transform 0.1s;
+  transition: transform 0.1s;
 }
 #chromeButton:hover {
   -webkit-transform: scale(1.05, 1.05);
+  transform: scale(1.05, 1.05);
 }
 #chromeButton:active {
   -webkit-transform: scale(0.9, 0.9);
+  transform: scale(0.9, 0.9);
 }
 #glasshouse {
   position: absolute;
@@ -217,10 +220,13 @@ loadButterflyAnimations();
 glasshouse.style.visibility = 'hidden';
 
 function updatePerspectiveOrigin() {
-  document.body.style.webkitPerspectiveOrigin = (innerWidth / 2) + 'px ' + (innerHeight / 2) + 'px';
+  var origin = (innerWidth / 2) + 'px ' + (innerHeight / 2) + 'px';
+  document.body.style.webkitPerspectiveOrigin = origin;
+  document.body.style.perspectiveOrigin = origin;
 }
 window.addEventListener('load', function(event) {
   document.body.style.webkitPerspective = perspectiveDistance + 'px';
+  document.body.style.perspective = perspectiveDistance + 'px';
   updatePerspectiveOrigin();
 });
 window.addEventListener('resize', updatePerspectiveOrigin);
@@ -234,6 +240,8 @@ chromeButton.addEventListener('click', function(event) {
 });
 
 window.addEventListener('mousemove', function(event) {
-  glasshouse.style.webkitTransform = 'rotateX(' + (-Math.atan((event.clientY / innerHeight - 0.5) * 2) / 2) + 'rad) rotateY(' + ((event.clientX - innerWidth / 2) * 0.25) + 'deg)';
+  var transform = 'rotateX(' + (-Math.atan((event.clientY / innerHeight - 0.5) * 2) / 2) + 'rad) rotateY(' + ((event.clientX - innerWidth / 2) * 0.25) + 'deg)'
+  glasshouse.style.webkitTransform = transform;
+  glasshouse.style.transform = transform;
 });
 </script>
