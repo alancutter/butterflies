@@ -32,6 +32,8 @@ body {
   position: absolute;
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
+  -webkit-transform-origin: 0 0;
+  transform-origin: 0 0;
   width: 100vw;
   height: 100vh;
   padding: 0;
@@ -108,7 +110,7 @@ body {
 <script src="web-animations.js"></script>
 <script>
 'use strict';
-var perspectiveDistance = innerWidth / 2;
+var perspectiveDistance;
 var logoRadius = 50;
 var maxButterflies = 100;
 var butterflyAnimations;
@@ -125,7 +127,7 @@ function deviateMidBias(x) {
 }
 
 function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
-  var butterfly = butterflyTemplate.content.childNodes[1].cloneNode();
+  var butterfly = butterflyTemplate.content.childNodes[1].cloneNode(true);
   mapDomElements(butterfly, function(div) { div.classList.add(colour); });
   glasshouse.appendChild(butterfly);
   var translation = butterfly.querySelector('.translation');
@@ -141,7 +143,7 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
             new Animation(translation, [
                 {transform: 'translate3d(' + x + 'px, ' + y + 'px, 0px)'},
                 {transform: 'translate3d(' + targetX + 'px, ' + targetY + 'px, ' + targetZ + 'px)'},
-              ], {duration: 7 + deviate(1), easing: 'cubic-bezier(0, 0.5, 1, 1)'}),
+              ], {duration: 7 + deviate(1), easing: 'cubic-bezier(0, 0.5, 0.8, 0.8)'}),
             new ParGroup([
                 new Animation(body, [{opacity: '1'}, {opacity: '0'}], 2),
                 new Animation(leftWing, [{opacity: '1'}, {opacity: '0'}], 2),
@@ -150,7 +152,7 @@ function createButterflyAnimation(colour, x, y, z, targetX, targetY, targetZ) {
           ]),
         new Animation(scale, [
             {transform: 'scale3d(0.2, 0.2, 0.2)'},
-            {transform: 'scale3d(0.35, 0.35, 0.35)'},
+            {transform: 'scale3d(0.4, 0.4, 0.4)'},
           ], 1),
         new Animation(rotation, [
             {transform: 'rotateY(' + deviate(360) + 'deg) rotateX(0deg)'},
@@ -206,32 +208,21 @@ function loadButterflyAnimations() {
     if ((destinationAngle > 0 && colour == 'green') || (destinationAngle < 0 && colour == 'yellow')) {
       destinationAngle *= -1;
     }
-    var distance = perspectiveDistance * (0.5 + random(colour == 'blue' ? 0.1 : 0.75));
+    var distance = perspectiveDistance * (0.5 + random(colour == 'blue' ? 0.25 : 0.75));
     var height = colour == 'red' ? -random(distance) : deviateMidBias(distance);
     var butterflyAnimation = createButterflyAnimation(
         colour,
-        innerWidth / 2 + x, innerHeight / 2 + y, 0,
-        innerWidth / 2 + Math.sin(destinationAngle) * distance, innerHeight / 2 + height, Math.cos(destinationAngle) * distance);
+        x, y, 0,
+        Math.sin(destinationAngle) * distance, height, Math.cos(destinationAngle) * distance);
     butterflyAnimation.player.paused = true;
     butterflyAnimations.push(butterflyAnimation);
   }
   armed = true;
 }
 
-function updatePerspectiveOrigin() {
-  var origin = (innerWidth / 2) + 'px ' + (innerHeight / 2) + 'px';
-  document.body.style.webkitPerspectiveOrigin = origin;
-  document.body.style.perspectiveOrigin = origin;
-}
-window.addEventListener('load', function(event) {
-  document.body.style.webkitPerspective = perspectiveDistance + 'px';
-  document.body.style.perspective = perspectiveDistance + 'px';
-  updatePerspectiveOrigin();
-});
-window.addEventListener('resize', updatePerspectiveOrigin);
 
 window.addEventListener('mousemove', function(event) {
-  var transform = 'rotateX(' + (-Math.atan((event.clientY / innerHeight - 0.5) * 2) / 2) + 'rad) rotateY(' + ((event.clientX - innerWidth / 2) * 0.25) + 'deg)'
+  var transform = 'translate(50%, 50%) rotateX(' + (-Math.atan((event.clientY / innerHeight - 0.5) * 2) / 2) + 'rad) rotateY(' + ((event.clientX - innerWidth / 2) * 0.25) + 'deg)'
   glasshouse.style.webkitTransform = transform;
   glasshouse.style.transform = transform;
 });
@@ -256,5 +247,15 @@ chromeButton.addEventListener('click', function(event) {
   }, 8000);
 });
 
+function updatePerspective() {
+  var origin = (innerWidth / 2) + 'px ' + (innerHeight / 2) + 'px';
+  document.body.style.webkitPerspectiveOrigin = origin;
+  document.body.style.perspectiveOrigin = origin;
+  perspectiveDistance = innerWidth / 2
+  document.body.style.webkitPerspective = perspectiveDistance + 'px';
+  document.body.style.perspective = perspectiveDistance + 'px';
+}
+window.addEventListener('resize', updatePerspective);
+window.addEventListener('load', updatePerspective);
 window.addEventListener('load', loadButterflyAnimations);
 </script>
