@@ -5326,7 +5326,9 @@ var maybeRestartAnimation = function() {
 };
 
 var DOCUMENT_TIMELINE = new Timeline(constructorToken);
-document.timeline = DOCUMENT_TIMELINE;
+try {
+  document.timeline = DOCUMENT_TIMELINE;
+} catch {}
 
 window.Element.prototype.animate = function(effect, timing) {
   var anim = new Animation(this, effect, timing);
