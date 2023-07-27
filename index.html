@@ -6,7 +6,6 @@ body {
   padding: 0;
   margin: 0px;
   position: absolute;
-  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
 }
 #chromeButton {
@@ -17,22 +16,17 @@ body {
   background-size: cover;
   width: 300px;
   height: 300px;
-  -webkit-transition: -webkit-transform 0.1s, opacity 1s;
   transition: transform 0.1s, opacity 1s;
 }
 #chromeButton:hover {
-  -webkit-transform: scale(1.05, 1.05);
   transform: scale(1.05, 1.05);
 }
 #chromeButton:active {
-  -webkit-transform: scale(0.9, 0.9);
   transform: scale(0.9, 0.9);
 }
 #glasshouse {
   position: absolute;
-  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
-  -webkit-transform-origin: 0 0;
   transform-origin: 0 0;
   width: 100vw;
   height: 100vh;
@@ -41,43 +35,37 @@ body {
 }
 .translation {
   position: absolute;
-  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
 }
 .rotation {
   position: absolute;
-  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
   left: 0;
   top: -125px;
-  -webkit-transform-origin: 0 125px;
   transform-origin: 0 125px;
 }
 .scale {
   position: absolute;
-  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
-  -webkit-transform-origin: 0 125px;
   transform-origin: 0 125px;
 }
 .body {
   position: absolute;
-  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
   width: 100px;
   height: 220px;
   background-image: url(butterflies.png);
-  -webkit-transform: translateX(-50px);
   transform: translateX(-50px);
+}
+.butterfly {
+  transform-style: preserve-3d;
 }
 .wing {
   position: absolute;
-  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
   width: 100px;
   height: 250px;
   background-image: url(butterflies.png);
-  -webkit-transform-origin: 0 125px;
   transform-origin: 0 125px;
 }
 
